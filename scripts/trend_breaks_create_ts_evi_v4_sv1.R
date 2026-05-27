@@ -41,7 +41,7 @@ library(doParallel)
 library(MODIS)
 
 library(raster) # Install raster after terra to avoid package issues
-library(sqldf)
+#library(sqldf)
 
 
 #=================================
@@ -56,9 +56,10 @@ dataf <- "/home/georod/projects/def-mfortin/georod/data/forc_ecu/inputs/modis/so
 #dataf <- "C:/Users/Peter R/Documents/data/gis"
 #dataf2 <- "C:/Users/Peter R/Documents/forc_southern_ecuador"
 dataf2 <- "/home/georod/projects/def-mfortin/georod/data/forc_ecu/outputs/"
+dataf3 <- "/home/georod/projects/def-mfortin/georod/data/forc_ecu/inputs/"
 
 # MODIS files with original sinusoidal proj for period 2001-2023
-#fpath <- paste0(dataf,"/modis/forc_ecu/inputs/modistsp/VI_16Days_250m_v61/EVI") # NDVI
+fpath <- paste0(dataf,"/modistsp/VI_16Days_250m_v61/EVI") # NDVI
 #fpath <- paste0(dataf,"/modis/southern_ecuador/modistsp/VI_16Days_250m_v61/EVI")
 
 
@@ -88,7 +89,7 @@ fpath3_9 <- paste0(dataf,"/modistsp/VI_16Days_250m_v61/QA_snow_ice")
 #shp1 <- "C:/Users/Peter R/Documents/PhD/resnet/data/gis/misc/algonquin_envelope_500m_buff_v1.shp"
 #shp1 <- "C:/Users/Peter R/Documents/PhD/resnet/data/gis/misc/algonquin_aoi3.shp"
 #shp1 <- "C:/Users/Peter R/Documents/forc_southern_ecuador/data/southern_ecuador_bbox_v1.geojson"
-shp1 <- paste0(dataf, "/forc_ecu/inputs/", "southern_ecuador_bbox_v1.geojson")
+shp1 <- paste0(dataf3, "southern_ecuador_bbox_v1.geojson")
 
 # Output folders
 #outf3 <- paste0(dataf, "/forc_trends_pj/algonquin/output_h5p/EVI_250m/bfast/")  # Note: h=0.5 run. Change back when done
@@ -156,8 +157,8 @@ timeSleep <- 3
 
 # (z in 1:2)
 # z in 3:nrow(periods1)
-#for (z in 1:nrow(periods1) ) {
-for (z in 6 ) {
+for (z in 1:nrow(periods1) ) {
+#for (z in 1 ) {
   
   
   # Path to raster files
@@ -251,7 +252,7 @@ for (z in 6 ) {
   rastfilesQA8 <- rastfilesQA8[periods1[z,1]:periods1[z, 2]]
   rastfilesQA9 <- rastfilesQA9[periods1[z,1]:periods1[z, 2]]
   
-  
+  print("done selecting QAs")
   #--------------------------------------
   # Read data
   #--------------------------------------
@@ -295,6 +296,7 @@ for (z in 6 ) {
   
   Sys.sleep(timeSleep)
   
+#stop("message stop")
   # Crop time series
   #r2QA <- crop(r1QA, vpolyList1[[1]])
   #nlyr(r2QA)
@@ -306,6 +308,8 @@ for (z in 6 ) {
   
   #saveRDS(r2QACL, paste0(outf3, periods1Labs[1], "/", "r2QACL.rds")) # I can't save rast object as RDS
   
+print("QAs cropped")
+
   Sys.sleep(timeSleep)
   
   # Reclassify QA pixel, keep only good ones. See Samantha2010
@@ -355,6 +359,8 @@ for (z in 6 ) {
     mask(r2[[j]], r2QAallMask[[j]])
   
   Sys.sleep(timeSleep)
+
+print("raster masked")
   
   # Read list of cleaned rasters
   r1C <- rast(r1CL)
@@ -420,6 +426,8 @@ for (z in 6 ) {
   
   # time-series
   rTs2 <- bfastts(t1, dates= rDates, type = c("16-day"))
+
+print("ts created")
   
   dir.create(paste0(outf3, periods1Labs[z]))
   
